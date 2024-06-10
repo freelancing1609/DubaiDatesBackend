@@ -26,10 +26,12 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 const user = require("./controller/userController");
 const profile = require("./controller/Profilecontroller");
 const admin = require("./controller/AdminController")
+const category=require("./controller/CategoryController")
 
 app.use("/api/user", user);
 app.use("/api/profile", profile);
 app.use("/api/admin", admin);
+app.use("/api/category", category);
 
 
 
