@@ -8,3 +8,13 @@ dist/
 # Ignore temporary files
 *.tmp
 *.log
+# Ignore node_modules directory
+node_modules/
+
+# Ignore build artifacts
+build/
+dist/
+
+# Ignore temporary files
+*.tmp
+*.log

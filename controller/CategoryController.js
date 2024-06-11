@@ -78,4 +78,22 @@ router.put('/update/:categoryId', isAdmin, upload.single('image'), async (req, r
     }
 });
 
+router.delete('/delete/:categoryId', isAdmin, async (req, res, next) => {
+    const { categoryId } = req.params;
+    try {
+        // Find the Goals by ID and delete it
+        let category = await Category.findByIdAndDelete(categoryId);
+
+        if (!category) {
+            return res.status(404).json({ success: false, message: 'Category not found' });
+        }
+
+        // Send response
+        res.status(200).json({ success: true, message: 'category  deleted successfully' });
+    } catch (error) {
+        // Handle errors
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;
