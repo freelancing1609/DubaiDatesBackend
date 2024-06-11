@@ -27,11 +27,19 @@ const user = require("./controller/userController");
 const profile = require("./controller/Profilecontroller");
 const admin = require("./controller/AdminController")
 const category=require("./controller/CategoryController")
+const flavour = require("./controller/FlavourController")
+const goal = require("./controller/GoalController")
+const hero = require("./controller/HeroController")
+const footer = require("./controller/FooterController")
 
 app.use("/api/user", user);
 app.use("/api/profile", profile);
 app.use("/api/admin", admin);
 app.use("/api/category", category);
+app.use("/api/flavour", flavour);
+app.use("/api/goal", goal);
+app.use("/api/hero", hero);
+app.use("/api/footer", footer);
 
 
 
