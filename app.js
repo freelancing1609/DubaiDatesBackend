@@ -31,6 +31,7 @@ const flavour = require("./controller/FlavourController")
 const goal = require("./controller/GoalController")
 const hero = require("./controller/HeroController")
 const footer = require("./controller/FooterController")
+const promo = require("./controller/PromoController")
 
 app.use("/api/user", user);
 app.use("/api/profile", profile);
@@ -39,6 +40,7 @@ app.use("/api/category", category);
 app.use("/api/flavour", flavour);
 app.use("/api/goal", goal);
 app.use("/api/hero", hero);
+app.use("/api/promo", promo);
 app.use("/api/footer", footer);
 
 
