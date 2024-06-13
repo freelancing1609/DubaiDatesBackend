@@ -32,7 +32,9 @@ const goal = require("./controller/GoalController")
 const hero = require("./controller/HeroController")
 const footer = require("./controller/FooterController")
 const promo = require("./controller/PromoController")
-const categoryFeaturedProduct = require("./controller/CategoryFeaturedProductController")
+const categoryFeaturedProduct = require("./controller/CategoryFeaturedProductController");
+const address = require("./controller/AddressController")
+const partner = require("./controller/PartnerController")
 
 app.use("/api/user", user);
 app.use("/api/profile", profile);
@@ -44,6 +46,8 @@ app.use("/api/hero", hero);
 app.use("/api/promo", promo);
 app.use("/api/category/feature", categoryFeaturedProduct);
 app.use("/api/footer", footer);
+app.use("/api/address", address);
+app.use("/api/partner", partner);
 
 
 
