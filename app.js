@@ -35,6 +35,7 @@ const promo = require("./controller/PromoController")
 const categoryFeaturedProduct = require("./controller/CategoryFeaturedProductController");
 const address = require("./controller/AddressController")
 const partner = require("./controller/PartnerController")
+const order = require("./controller/OrderController")
 
 app.use("/api/user", user);
 app.use("/api/profile", profile);
@@ -48,9 +49,7 @@ app.use("/api/category/feature", categoryFeaturedProduct);
 app.use("/api/footer", footer);
 app.use("/api/address", address);
 app.use("/api/partner", partner);
-
-
-
+app.use("/api/order",order);
 
 
 app.use(ErrorHandler);
