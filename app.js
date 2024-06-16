@@ -38,6 +38,7 @@ const partner = require("./controller/PartnerController")
 const product = require("./controller/ProductController")
 const productreview = require("./controller/ProductReviewController")
 const search = require("./controller/SearchController")
+const coupon = require("./controller/couponController")
 
 app.use("/api/user", user);
 app.use("/api/profile", profile);
@@ -54,6 +55,7 @@ app.use("/api/partner", partner);
 app.use("/api/product", product);
 app.use("/api/productreview", productreview);
 app.use("/api/search", search);
+app.use("/api/coupon", coupon);
 
 
 

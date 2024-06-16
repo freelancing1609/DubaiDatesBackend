@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ProductReviewSchema = require('./ProductReview').schema;
+const couponSchema = require('./Coupon').schema;
 
 const ProductSchema = new mongoose.Schema({
     _id: { type: Number },
@@ -24,6 +25,7 @@ const ProductSchema = new mongoose.Schema({
     product_ingredients: { type: String },
     product_details: { type: String },
     product_reviews: { type: [ProductReviewSchema] ,default: []},
+    product_coupons: { type: [couponSchema] ,default: []},
     product_categories: [{ type: Object }],
     product_falvours: [{ type: Object }],
     product_goal: [{ type: Object }],
