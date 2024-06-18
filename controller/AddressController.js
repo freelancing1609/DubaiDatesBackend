@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const Address = require('../model/Address');
 const User = require('../model/User');
 const {isAuthenticated} = require("../middleware/auth");
 
@@ -8,38 +9,81 @@ const {isAuthenticated} = require("../middleware/auth");
 // Add Address
 router.post('/:userId/addresses/create', isAuthenticated, async (req, res, next) => {
     try {
-      const user = await User.findById(req.params.userId);
+      const { userId } = req.params;
+        const { street, city, state, zipCode, locality,full_address, time_of_delivery,landmark,alt_phoneNumber,phoneNumber,name } = req.body;
+      const user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-      const newAddress = req.body;
-      if (!newAddress.time_of_delivery) {
-        newAddress.time_of_delivery = 'home'; // Ensure default value if not provided
-      }
-      user.addresses.push(newAddress);
-      await user.save();
-      res.status(201).json(user.addresses);
+      const newAddress = new Address({
+        user_id: userId,
+        name,
+        phoneNumber,
+        alt_phoneNumber,
+        landmark,
+        street,
+        city,
+        state,
+        zipCode,
+        locality,
+        full_address,
+        time_of_delivery: time_of_delivery || 'home', // Default if not provided
+    });
+
+    await newAddress.save();
+    // Add address reference to user
+    if (!user.addresses) {
+      user.addresses = []; // Initialize addresses array if not exists
+  }
+  user.addresses.push(newAddress._id);
+  await user.save();
+    res.status(201).json(newAddress);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   });
   
-  // Update Address
   router.put('/:userId/addresses/:addressId', isAuthenticated, async (req, res, next) => {
     try {
-        const user = await User.findById(req.params.userId);
+        const { userId, addressId } = req.params;
+        const {
+            street,
+            city,
+            state,
+            zipCode,
+            locality,
+            full_address,
+            time_of_delivery,
+            landmark,
+            alt_phoneNumber,
+            phoneNumber,
+            name
+        } = req.body;
+
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        
-        // Find the address by _id instead of addressId
-        const address = user.addresses.find(a => a._id.toString() === req.params.addressId);
+
+        const address = await Address.findById(addressId);
         if (!address) {
             return res.status(404).json({ message: 'Address not found' });
         }
-        
-        Object.assign(address, req.body);
-        await user.save();
+
+        // Update address fields
+        address.street = street || address.street;
+        address.city = city || address.city;
+        address.state = state || address.state;
+        address.zipCode = zipCode || address.zipCode;
+        address.locality = locality || address.locality;
+        address.full_address = full_address || address.full_address;
+        address.time_of_delivery = time_of_delivery || address.time_of_delivery;
+        address.landmark = landmark || address.landmark;
+        address.alt_phoneNumber = alt_phoneNumber || address.alt_phoneNumber;
+        address.phoneNumber = phoneNumber || address.phoneNumber;
+        address.name = name || address.name;
+
+        await address.save();
         res.status(200).json(address);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -48,40 +92,50 @@ router.post('/:userId/addresses/create', isAuthenticated, async (req, res, next)
 
   
 router.delete('/:userId/addresses/:addressId', isAuthenticated, async (req, res, next) => {
-    try {
-        const user = await User.findById(req.params.userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        
-        // Find the index of the address to delete by _id
-        const addressIndex = user.addresses.findIndex(a => a._id.toString() === req.params.addressId);
-        if (addressIndex === -1) {
-            return res.status(404).json({ message: 'Address not found' });
-        }
-        
-        // Remove the address from the addresses array
-        user.addresses.splice(addressIndex, 1);
-        
-        await user.save();
-        res.status(200).json({ message: 'Address deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+  try {
+      const { userId, addressId } = req.params;
+
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      
+      // Remove the address reference from the user
+      const addressIndex = user.addresses.indexOf(addressId);
+      if (addressIndex === -1) {
+          return res.status(404).json({ message: 'Address not found in user record' });
+      }
+      
+      user.addresses.splice(addressIndex, 1);
+      await user.save();
+      
+      // Remove the actual address document
+      await Address.findByIdAndRemove(addressId);
+      
+      res.status(200).json({ message: 'Address deleted successfully' });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
 });
 
   
   // Get Addresses
-  router.get('/:userId/addresses-get',isAuthenticated, async (req, res, next) => {
+  router.get('/:userId/addresses', isAuthenticated, async (req, res, next) => {
     try {
-      const user = await User.findById(req.params.userId);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.status(200).json(user.addresses);
+        const { userId } = req.params;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Fetch all addresses by the list of address IDs
+        const addresses = await Address.find({ _id: { $in: user.addresses } });
+
+        res.status(200).json(addresses);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
-  });
+});
   
   module.exports = router;

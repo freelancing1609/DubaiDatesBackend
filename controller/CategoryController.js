@@ -34,7 +34,7 @@ router.post('/create', isAdmin, upload.single('image'), async (req, res, next) =
         res.status(500).json({ error: error.message });
     }
 });
-router.get('/categories', isAuthenticated,async (req, res, next) => {
+router.get('/categories',async (req, res, next) => {
     try {
         // Fetch all categories from the database
         const categories = await Category.find();

@@ -1,19 +1,8 @@
 const mongoose = require('mongoose');
 const jwt = require("jsonwebtoken");
+const Schema = mongoose.Schema;
 
 
-const AddressSchema = new mongoose.Schema({
-    name: { type: String, trim: true },
-    phoneNumber: { type: Number},
-    alt_phoneNumber: { type: Number},
-    landmark: { type: String },
-    city: { type: String},
-    state: { type: String},
-    zipCode: { type: String},
-    time_of_delivery: { type: String, default: "Home" },
-    locality: { type: String},
-    full_address:{type:String}
-  });
 
 const UserSchema = new mongoose.Schema({
     _id: { type: Number },
@@ -22,7 +11,7 @@ const UserSchema = new mongoose.Schema({
     phoneNumber: { type: Number, required: [true, "Please enter your phone number!"], unique: true },
     dateOfBirth: { type: Date, default: null },
     gender: { type: String, default: null },
-    addresses: { type: [AddressSchema], default: [] }
+    addresses: [{ type: Schema.Types.ObjectId, ref: 'Address' }],
 });
 
 // Define a pre-save hook to set the _id field before saving the document

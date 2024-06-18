@@ -20,6 +20,7 @@ router.post('/create',isAdmin, upload.fields([
         const { 
             name,
             weight,
+            weight_type,
             sku,
             sale_price,
             mrp,
@@ -38,20 +39,18 @@ router.post('/create',isAdmin, upload.fields([
         if (!req.files || !req.files.product_image || !req.files.product_slide_image || !req.files.product_promo_banner_image || !req.files.product_video_image || !req.files.product_creative_image) {
             return res.status(400).json({ success: false, message: 'images   are required' });
         }
-       // Ensure category IDs are provided and valid
-       if (!Array.isArray(product_categories,product_falvours,product_goal)) {
-        return res.status(400).json({ success: false, message: 'product_categories product_goal product_falvours must be an array' });
-    }
+       
 
     // Convert category IDs to ObjectId
-    const categoryIds = product_categories
-    const falourId = product_falvours
-    const goalId = product_goal
+    const categoriesID = product_categories;
+    const flavours = product_falvours;
+    const goals = product_goal;
+    console.log(categoriesID)
 
     // Validate category IDs and fetch category details
-    const categories = await Category.find({ _id: { $in: categoryIds } });
-    const falvours = await Flavour.find({ _id: { $in: falourId } });
-    const goal = await Goal.find({ _id: { $in: goalId } });
+    const categories = await Category.find({ _id: { $in: categoriesID } });
+    const falvours = await Flavour.find({ _id: { $in: flavours } });
+    const goal = await Goal.find({ _id: { $in: goals } });
 
     if (categories.length !== product_categories.length) {
         return res.status(400).json({ success: false, message: 'Invalid category IDs provided' });
@@ -88,6 +87,7 @@ router.post('/create',isAdmin, upload.fields([
         const product = new Product({
             name,
             weight,
+            weight_type,
             sku,
             sale_price,
             mrp,
@@ -127,6 +127,7 @@ router.put('/update/:productId', isAdmin, upload.fields([
         const { 
             name,
             weight,
+            weight_type,
             sku,
             sale_price,
             mrp,
@@ -199,6 +200,7 @@ router.put('/update/:productId', isAdmin, upload.fields([
             // Update product fields
             product.name = name;
             product.weight = weight;
+            product.weight_type = weight_type;
             product.sku = sku;
             product.sale_price = sale_price;
             product.mrp = mrp;
@@ -234,6 +236,7 @@ router.put('/update/:productId', isAdmin, upload.fields([
             product = new Product({
                 name,
                 weight,
+                weight_type,
                 sku,
                 sale_price,
                 mrp,

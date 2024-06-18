@@ -11,7 +11,7 @@ const OrderItemSchema = new mongoose.Schema({
     weight: { type: Number },
     stock_level: { type: Number },
     delivery_expected: { type: Date },
-    delivery_status: { type: String },
+    delivery_status: { type: String, default: "Pending" },
     coupon_id: { type: Number, ref: 'Coupon' }
 });
 

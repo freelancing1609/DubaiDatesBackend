@@ -3,9 +3,11 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const Coupon = require('../model/Coupon');
 const Product = require('../model/Product');
+const {isAuthenticated} = require("../middleware/auth");
+const { isAdmin } = require('../middleware/admin');
 
 // Create a new coupon
-router.post('/create', async (req, res) => {
+router.post('/create',isAdmin, async (req, res) => {
     try {
         const couponData = req.body;
         const coupon = new Coupon(couponData);
@@ -27,7 +29,7 @@ router.post('/create', async (req, res) => {
 });
 
 // Get all coupons
-router.get('/list', async (req, res) => {
+router.get('/list',isAdmin, async (req, res) => {
     try {
         const coupons = await Coupon.find();
         res.status(200).json({ success: true, coupons });
@@ -37,7 +39,7 @@ router.get('/list', async (req, res) => {
 });
 
 // Apply a coupon
-router.post('/apply', async (req, res) => {
+router.post('/apply',isAuthenticated, async (req, res) => {
     try {
         const { coupon_name, product_id, total_price } = req.body;
 

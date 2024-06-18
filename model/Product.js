@@ -9,6 +9,7 @@ const ProductSchema = new mongoose.Schema({
     _id: { type: Number },
     name: { type: String, required: true },
     weight: { type: String, required: true },
+    weight_type: { type: String, required: true },
     sku: { type: String, required: true },
     sale_price: { type: Number, required: true },
     mrp: { type: Number, required: true },

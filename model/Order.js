@@ -6,7 +6,7 @@ const OrderSchema = new mongoose.Schema({
     payment_status: { type: String, required: true },
     total_price: { type: Number, required: true },
     delivery_charge: { type: Number, required: true },
-    address_id: { type: Number, required: true },
+    address_id: { type: String, required: true },
     order_items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OrderItem' }]
 });
 
