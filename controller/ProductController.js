@@ -143,15 +143,16 @@ router.put('/update/:productId', isAdmin, upload.fields([
             product_goal
         } = req.body;
 
-        // Validate category IDs, flavour IDs, and goal IDs
-        if (!Array.isArray(product_categories,product_falvours,product_goal)) {
-            return res.status(400).json({ success: false, message: 'product_categories product_goal product_falvours must be an array' });
-        }
+        // // Validate category IDs, flavour IDs, and goal IDs
+        // if (!Array.isArray(product_categories,product_falvours,product_goal)) {
+        //     return res.status(400).json({ success: false, message: 'product_categories product_goal product_falvours must be an array' });
+        // }
 
         // Convert category IDs, flavour IDs, and goal IDs to ObjectId
         const categoryIds = product_categories;
         const flavourIds = product_falvours;
         const goalIds = product_goal;
+        console.log(categoryIds)
 
         // Validate category IDs and fetch category details
         const categories = await Category.find({ _id: { $in: categoryIds } });
@@ -291,4 +292,21 @@ router.get('/products/:productId', async (req, res) => {
     }
 });
 
+router.delete('/delete/:productId', isAdmin, async (req, res, next) => {
+    const { productId } = req.params;
+    try {
+        // Find the Goal by ID and delete it
+        const product = await Product.findByIdAndDelete(productId);
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'product not found' });
+        }
+
+        // Send response
+        res.status(200).json({ success: true, message: 'product deleted successfully' });
+    } catch (error) {
+        // Handle errors
+        res.status(500).json({ error: error.message });
+    }
+});
 module.exports = router;

@@ -6,6 +6,7 @@ const twilio = require('twilio');
 const {isAuthenticated} = require("../middleware/auth");
 const sendToken = require('../utils/jwtToken');
 const ErrorHandler = require("../utils/ErrorHandler");
+const { isAdmin } = require('../middleware/admin');
 
 // Twilio client initialization
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -91,6 +92,14 @@ router.post('/login', async (req, res, next) => {
 router.get('/protected-route', isAuthenticated, (req, res) => {
     // Access req.user to get user info
     res.status(200).json({ message: 'Access granted', user: req.user });
+});
+router.get('/alluser', async (req, res) => {
+    try {
+        const user = await User.find();
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 

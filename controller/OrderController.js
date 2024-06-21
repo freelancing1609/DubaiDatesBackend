@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../model/Order');
 const User = require('../model/User');
+const Address = require('../model/Address');
 const OrderItem = require('../model/OrderItem');
 const ErrorHandler = require("../utils/ErrorHandler");
 const {isAuthenticated} = require("../middleware/auth");
@@ -83,32 +84,71 @@ router.put('/update/:orderId',isAdmin, async (req, res, next) => {
 
 
 // Get all orders
+// router.get('/all', isAdmin, async (req, res, next) => {
+//     try {
+//         const orders = await Order.find().populate('order_items').populate({
+//             path: 'user_id',
+//             select: 'name email phoneNumber addresses', // Populate user details including addresses
+//         })
+        
+//         // Manually filter the address
+//         const ordersWithSpecificAddress = orders.map(order => {
+//             const user = order.user_id.toObject();
+//             const addresses = user.addresses || [];
+//             const specificAddress = addresses.find(address => address._id.toString() === order.address_id);
+            
+//             return {
+//                 ...order.toObject(),
+//                 user_id: {
+//                     ...user,
+//                     addresses: specificAddress ? [specificAddress] : [],
+//                 }
+//             };
+//         });
+//         res.status(200).json({ success: true, orders: ordersWithSpecificAddress });
+//     } catch (error) {
+//         next(new ErrorHandler(error.message, 500));
+//     }
+// });
+
 router.get('/all', isAdmin, async (req, res, next) => {
     try {
-        const orders = await Order.find().populate('order_items').populate({
-            path: 'user_id',
-            select: 'name email phoneNumber addresses', // Populate user details including addresses
-        })
-        
-        // Manually filter the address
-        const ordersWithSpecificAddress = orders.map(order => {
-            const user = order.user_id.toObject();
-            const addresses = user.addresses || [];
-            const specificAddress = addresses.find(address => address._id.toString() === order.address_id);
+        // Fetch orders and populate 'order_items', 'user_id', and 'address_id'
+        const orders = await Order.find()
+            .populate('order_items')
+            .populate({
+                path: 'user_id',
+                model: 'User', // Specify the model to populate for user_id
+                select: 'name email phoneNumber', // Fields to select from User model
+            })
             
+
+        // Transform orders to include specific user data and address
+        const ordersWithSpecificData = await Promise.all(orders.map(async (order) => {
+            // Extract specific address
+            let specificAddress;
+            if (order.address_id) {
+                specificAddress = await Address.findById(order.address_id);
+            }
+
+            // Extract specific user data
+            const user = order.user_id.toObject(); // Convert user_id to plain object
+
             return {
                 ...order.toObject(),
                 user_id: {
                     ...user,
                     addresses: specificAddress ? [specificAddress] : [],
-                }
+                },
             };
-        });
-        res.status(200).json({ success: true, orders: ordersWithSpecificAddress });
+        }));
+
+        res.status(200).json({ success: true, orders: ordersWithSpecificData });
     } catch (error) {
         next(new ErrorHandler(error.message, 500));
     }
 });
+
 
 // Get orders by user ID
 router.get('/user/:user_id', isAuthenticated, async (req, res, next) => {

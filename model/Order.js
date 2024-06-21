@@ -7,7 +7,9 @@ const OrderSchema = new mongoose.Schema({
     total_price: { type: Number, required: true },
     delivery_charge: { type: Number, required: true },
     address_id: { type: String, required: true },
-    order_items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OrderItem' }]
+    order_items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OrderItem' }],
+    created_date: { type: Date, default: Date.now },
+    
 });
 
 // Pre-save hook to set the order_id field

@@ -87,4 +87,22 @@ router.put('/update/:id',
     }
 );
 
+router.delete('/delete/:id', isAdmin, async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        // Find the Goal by ID and delete it
+        const promo = await Promo.findByIdAndDelete(id);
+
+        if (!promo) {
+            return res.status(404).json({ success: false, message: 'Promo not found' });
+        }
+
+        // Send response
+        res.status(200).json({ success: true, message: 'promo deleted successfully' });
+    } catch (error) {
+        // Handle errors
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

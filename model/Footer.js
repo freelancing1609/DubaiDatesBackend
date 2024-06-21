@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const Category = require('./Category');
 
 const footerSchema = new mongoose.Schema({
-    foot_image: { type: String, required: [true, "Please enter your Image Url!"] },
+    foot_image: { type: String},
   categories: [{ type: Object }],
   quickLinks: [{
     name: { type: String, required: [true, "Please enter quicklinks name!"], trim: true },
-    _id: { type: Number, unique: true },
+    
     links: { type: String, required: [true, "Please enter quicklinks links!"], trim: true }
   }],
   contactUs: {
@@ -16,7 +16,7 @@ const footerSchema = new mongoose.Schema({
   },
   socialLinks: [{
     name: { type: String, required: [true, "Please enter sociallinks name!"], trim: true },
-    _id: { type: Number, unique: true },
+    
     links: { type: String, required: [true, "Please enter quicklinks links!"], trim: true }
   }]
 });

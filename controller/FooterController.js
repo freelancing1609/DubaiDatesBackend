@@ -9,40 +9,30 @@ const upload = require('../middleware/upload');
 // Create Endpoint for Creating or Updating Footer Data
 router.post('/footer-add', isAdmin,upload.single('image'), async (req, res) => {
     try {
+        let contactUs, quickLinks, socialLinks;
+
+        try {
+            contactUs = req.body.contactUs ? JSON.parse(req.body.contactUs) : {};
+            quickLinks = req.body.quickLinks ? JSON.parse(req.body.quickLinks) : [];
+            socialLinks = req.body.socialLinks ? JSON.parse(req.body.socialLinks) : [];
+          } catch (parseError) {
+            return res.status(400).json({ success: false, message: 'Invalid JSON data' });
+          }
         let footer = await Footer.findOne();
         if (!footer) {
             footer = new Footer();
         }
 
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: 'No image uploaded' });
-        }
+        if (req.file) {
+            const imageUrl = req.file.path; // Assuming the path is provided by your middleware
+            footer.foot_image = imageUrl;
+          }
 
-        // Get the image URL from Cloudinary
-        const imageUrl =  req.file.path;
-        console.log(imageUrl)
-        // Update footer fields
-        footer.foot_image = imageUrl;
-        footer.contactUs = req.body.contactUs
-        // Generate IDs for quicklinks if not already present
-        if (req.body.quickLinks && req.body.quickLinks.length > 0) {
-            req.body.quickLinks.forEach((link, index) => {
-                if (!link._id) {
-                    link._id = index + 1; // Start from 1
-                }
-            });
-        }
-        footer.quickLinks = req.body.quickLinks;
+          footer.contactUs = contactUs;
+    footer.quickLinks = quickLinks;
+    footer.socialLinks = socialLinks;
+          
         
-        // Generate IDs for socialLinks if not already present
-        if (req.body.socialLinks && req.body.socialLinks.length > 0) {
-            req.body.socialLinks.forEach((link, index) => {
-                if (!link._id) {
-                    link._id = index + 1; // Start from 1
-                }
-            });
-        }
-        footer.socialLinks = req.body.socialLinks;
 
         // Save the updated footer
         const updatedFooter = await footer.save();

@@ -12,6 +12,7 @@ const UserSchema = new mongoose.Schema({
     dateOfBirth: { type: Date, default: null },
     gender: { type: String, default: null },
     addresses: [{ type: Schema.Types.ObjectId, ref: 'Address' }],
+    created_date: { type: Date, default: Date.now },
 });
 
 // Define a pre-save hook to set the _id field before saving the document

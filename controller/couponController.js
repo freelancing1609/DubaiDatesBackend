@@ -105,4 +105,22 @@ router.post('/apply',isAuthenticated, async (req, res) => {
     }
 });
 
+router.delete('/delete/:id', isAdmin, async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        // Find the Goal by ID and delete it
+        const coupon = await Coupon.findByIdAndDelete(id);
+
+        if (!coupon) {
+            return res.status(404).json({ success: false, message: 'Coupon not found' });
+        }
+
+        // Send response
+        res.status(200).json({ success: true, message: 'Coupon deleted successfully' });
+    } catch (error) {
+        // Handle errors
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;
