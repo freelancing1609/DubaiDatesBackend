@@ -6,24 +6,36 @@ const Promo = require('../model/Promo'); // Import your Promo model
 const { isAuthenticated } = require('../middleware/auth');
 
 // Define the route to create a promo
-router.post('/create', isAdmin, upload.fields([{ name: 'promo_image', maxCount: 1 }, { name: 'promo_mobileImage', maxCount: 1 }]), async (req, res, next) => {
-    const { promo_title, promo_subTitle } = req.body;
+router.post('/create', isAdmin, upload.fields([ { name: 'promo_products[].slide_image', maxCount: 1 }, { name: 'promo_products[].mobile_image', maxCount: 1 }]), async (req, res, next) => {
+    const { promo_title, promo_description, promo_products } = req.body;
     try {
-        // Check if both images are uploaded
-        if (!req.files || !req.files.promo_image || !req.files.promo_mobileImage) {
-            return res.status(400).json({ success: false, message: 'Both promo_image and promo_mobileImage are required' });
+  
+
+        // Parse the promo products JSON if it's a string
+        let promoProducts = [];
+        if (typeof promo_products === 'string') {
+            promoProducts = JSON.parse(promo_products);
+        } else {
+            promoProducts = promo_products;
         }
 
-        // Get the image URLs from Cloudinary
-        const promoImageUrl = req.files.promo_image[0].path;
-        const promoMobileImageUrl = req.files.promo_mobileImage[0].path;
+        // Update the promo products with image paths
+        promoProducts = promoProducts.map((product, index) => {
+            if (req.files[`promo_products[${index}].slide_image`]) {
+                product.slide_image = req.files[`promo_products[${index}].slide_image`][0].path;
+            }
+            if (req.files[`promo_products[${index}].mobile_image`]) {
+                product.mobile_image = req.files[`promo_products[${index}].mobile_image`][0].path;
+            }
+            return product;
+        });
 
         // Create a new promo object
         const newPromo = new Promo({
             promo_title,
-            promo_subTitle,
+            promo_description,
             promo_image: promoImageUrl, // Save the promo image URL to the database
-            promo_mobileImage: promoMobileImageUrl // Save the promo mobile image URL to the database
+            promo_products: promoProducts,
         });
 
         // Save the promo to the database
@@ -36,8 +48,9 @@ router.post('/create', isAdmin, upload.fields([{ name: 'promo_image', maxCount: 
         res.status(500).json({ error: error.message });
     }
 });
+
 // Define the route to get all promos
-router.get('/get',async (req, res, next) => {
+router.get('/get', async (req, res, next) => {
     try {
         // Fetch all promos from the database
         const promos = await Promo.find();
@@ -50,47 +63,55 @@ router.get('/get',async (req, res, next) => {
 });
 
 // Define the route to update a promo
-router.put('/update/:id', 
-    isAdmin, 
-    upload.fields([{ name: 'promo_image', maxCount: 1 }, { name: 'promo_mobileImage', maxCount: 1 }]), 
-    async (req, res, next) => {
-        const { id } = req.params;
-        const { promo_title, promo_subTitle } = req.body;
-        try {
-            // Find the promo by ID
-            const promo = await Promo.findById(id);
-            if (!promo) {
-                return res.status(404).json({ success: false, message: 'Promo not found' });
-            }
-
-            // Update promo fields
-            if (promo_title) promo.promo_title = promo_title;
-            if (promo_subTitle) promo.promo_subTitle = promo_subTitle;
-
-            // Check if new images are uploaded
-            if (req.files && req.files.promo_image) {
-                promo.promo_image = req.files.promo_image[0].path;
-            }
-            if (req.files && req.files.promo_mobileImage) {
-                promo.promo_mobileImage = req.files.promo_mobileImage[0].path;
-            }
-
-            // Save the updated promo to the database
-            const updatedPromo = await promo.save();
-
-            // Send response
-            res.status(200).json({ success: true, updatedPromo });
-        } catch (error) {
-            // Handle errors
-            res.status(500).json({ error: error.message });
+router.put('/update/:id', isAdmin, upload.fields([ { name: 'promo_products[].slide_image', maxCount: 1 }, { name: 'promo_products[].mobile_image', maxCount: 1 }]), async (req, res, next) => {
+    const { id } = req.params;
+    const { promo_title, promo_description, promo_products } = req.body;
+    try {
+        // Find the promo by ID
+        const promo = await Promo.findById(id);
+        if (!promo) {
+            return res.status(404).json({ success: false, message: 'Promo not found' });
         }
-    }
-);
 
+        // Update promo fields
+        if (promo_title) promo.promo_title = promo_title;
+        if (promo_description) promo.promo_description = promo_description;
+        
+
+        // Update promo products if provided
+        if (promo_products) {
+            let promoProducts = typeof promo_products === 'string' ? JSON.parse(promo_products) : promo_products;
+
+            // Update the promo products with image paths
+            promoProducts = promoProducts.map((product, index) => {
+                if (req.files[`promo_products[${index}].slide_image`]) {
+                    product.slide_image = req.files[`promo_products[${index}].slide_image`][0].path;
+                }
+                if (req.files[`promo_products[${index}].mobile_image`]) {
+                    product.mobile_image = req.files[`promo_products[${index}].mobile_image`][0].path;
+                }
+                return product;
+            });
+
+            promo.promo_products = promoProducts;
+        }
+
+        // Save the updated promo to the database
+        const updatedPromo = await promo.save();
+
+        // Send response
+        res.status(200).json({ success: true, updatedPromo });
+    } catch (error) {
+        // Handle errors
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Define the route to delete a promo
 router.delete('/delete/:id', isAdmin, async (req, res, next) => {
     const { id } = req.params;
     try {
-        // Find the Goal by ID and delete it
+        // Find the promo by ID and delete it
         const promo = await Promo.findByIdAndDelete(id);
 
         if (!promo) {
@@ -98,7 +119,7 @@ router.delete('/delete/:id', isAdmin, async (req, res, next) => {
         }
 
         // Send response
-        res.status(200).json({ success: true, message: 'promo deleted successfully' });
+        res.status(200).json({ success: true, message: 'Promo deleted successfully' });
     } catch (error) {
         // Handle errors
         res.status(500).json({ error: error.message });
