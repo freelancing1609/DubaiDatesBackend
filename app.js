@@ -40,6 +40,8 @@ const product = require("./controller/ProductController")
 const productreview = require("./controller/ProductReviewController")
 const search = require("./controller/SearchController")
 const coupon = require("./controller/couponController")
+const shopByCategory=require("./controller/ShopByCategoryController")
+const energySection=require("./controller/EnergySectionController")
 
 app.use("/api/user", user);
 app.use("/api/profile", profile);
@@ -58,7 +60,8 @@ app.use("/api/productreview", productreview);
 app.use("/api/search", search);
 app.use("/api/coupon", coupon);
 app.use("/api/order",order);
-
+app.use("/api/shopByCategory",shopByCategory);
+app.use("/api/energySection",energySection)
 
 
 app.use(ErrorHandler);

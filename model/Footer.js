@@ -11,7 +11,7 @@ const footerSchema = new mongoose.Schema({
   }],
   contactUs: {
     email: { type: String, required: [true, "Please enter your email!"], unique: true, trim: true },
-    phoneNumber: { type: Number, required: [true, "Please enter your phone number!"], unique: true },
+    phoneNumber: { type: String, required: [true, "Please enter your phone number!"], unique: true },
     address: { type: String, required: [true, "Please enter your address!"], unique: true, trim: true },
   },
   socialLinks: [{
@@ -26,6 +26,7 @@ footerSchema.pre('save', async function(next) {
     try {
         // Fetch all categories from the database
         const allCategories = await Category.find();
+        console.log(allCategories)
         // Map category IDs and assign to categories field
         this.categories = allCategories.map(category => ({
             _id: category._id,
