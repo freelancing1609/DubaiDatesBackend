@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../model/Order');
+const User = require('../model/User');
+const Product = require('../model/Product');
 const Address = require('../model/Address');
 const OrderItem = require('../model/OrderItem');
 const ErrorHandler = require("../utils/ErrorHandler");
@@ -25,6 +27,20 @@ router.post('/create', isAuthenticated(["admin"],[createOrder]), async (req, res
 
         // Create OrderItems and update with order_id
         const createdOrderItems = await Promise.all(order_items.map(async item => {
+            // Fetch the product
+            const product = await Product.findById(item.product_id);
+            if (!product) {
+                throw new Error(`Product with ID ${item.product_id} not found`);
+            }
+
+            // Check if enough stock is available
+            if (product.stock_levels < item.quantity) {
+                throw new Error(`Not enough stock for product: ${product.name}`);
+            }
+
+            // Reduce the stock level
+            product.stock_levels -= item.quantity;
+            await product.save();
 
             const orderItem = new OrderItem({
                 order_id: order._id,
