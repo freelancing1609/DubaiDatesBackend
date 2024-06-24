@@ -37,7 +37,7 @@ router.post('/create',isAdmin, upload.fields([
         } = req.body;
         // Upload images to Cloudinary and get URLs
         if (!req.files || !req.files.product_image || !req.files.product_slide_image || !req.files.product_promo_banner_image || !req.files.product_video_image || !req.files.product_creative_image) {
-            return res.status(400).json({ success: false, message: 'images   are required' });
+            return res.status(400).json({ success: false, message: 'images are required' });
         }
        
 
@@ -45,7 +45,6 @@ router.post('/create',isAdmin, upload.fields([
     const categoriesID = product_categories;
     const flavours = product_falvours;
     const goals = product_goal;
-    console.log(categoriesID)
 
     // Validate category IDs and fetch category details
     const categories = await Category.find({ _id: { $in: categoriesID } });
@@ -152,7 +151,6 @@ router.put('/update/:productId', isAdmin, upload.fields([
         const categoryIds = product_categories;
         const flavourIds = product_falvours;
         const goalIds = product_goal;
-        console.log(categoryIds)
 
         // Validate category IDs and fetch category details
         const categories = await Category.find({ _id: { $in: categoryIds } });

@@ -23,6 +23,7 @@ const ProductSchema = new mongoose.Schema({
     product_description: { type: String },
     product_overview: { type: String },
     product_benefits: { type: String },
+    product_details:{type:String},
     product_ingredients: { type: String },
     product_details: { type: String },
     product_reviews: { type: [ProductReviewSchema] ,default: []},

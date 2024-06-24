@@ -16,7 +16,6 @@ router.post('/create', isAdmin, upload.single('image'), async (req, res, next) =
 
         // Get the image URL from Cloudinary
         const imageUrl =  req.file.path;
-        console.log(imageUrl)
         // Create a new category object
         const newCategory = new Category({
             name,

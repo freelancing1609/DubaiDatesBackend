@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+  "start": "npx nodemon server.js"
   },
   "author": "shahriar Sajeeb",
   "license": "ISC",
@@ -35,6 +35,6 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.3"
+    "nodemon": "^3.1.4"
   }
 }

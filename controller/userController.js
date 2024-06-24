@@ -60,6 +60,31 @@ router.post('/register', async (req, res, next) => {
         res.status(500).json({ error: error.message });
     }
 });
+router.put('/updateProfile/:userId', isAuthenticated, async (req, res, next) => {
+    const { name, email, gender,birth_date } = req.body;
+    const userId = Number(req.params.userId); 
+    try {
+        // Find the user by ID
+        let user = await User.findOne({_id:userId})
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Update user fields
+        if (name) user.name = name;
+        if (email) user.email = email;
+        if (gender) user.gender = gender;
+        if (birth_date) user.birth_date = birth_date;
+        // Save the updated user to the database
+        user = await user.save();
+
+        // Send response
+        res.status(200).json({ success: true, user });
+    } catch (error) {
+        // Handle errors
+        res.status(500).json({ error: error.message });
+    }
+});
 
 
 // Login with OTP
@@ -71,8 +96,8 @@ router.post('/login', async (req, res, next) => {
         const verification = await client.verify.v2.services(process.env.TWILIO_SERVICE_SID)
             .verificationChecks
             .create({ to: phoneNumberWithCountryCode, code: otp });
- 
-        if (verification.status !== 'approved') {
+
+            if (verification.status !== 'approved') {
             throw new Error('Invalid OTP');
         }
         const user = await User.findOne({ phoneNumber })
@@ -83,8 +108,13 @@ router.post('/login', async (req, res, next) => {
 
         // Authenticate user (you can generate JWT here if needed)
         sendToken(user, 200, res);
+<<<<<<< HEAD
         // res.status(200).json({ message: 'Login successful' });
+=======
+        
+>>>>>>> b0c218e9060fea47271811c139c77e64e6b2045a
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: error.message });
     }
 });
