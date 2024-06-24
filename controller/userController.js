@@ -108,11 +108,7 @@ router.post('/login', async (req, res, next) => {
 
         // Authenticate user (you can generate JWT here if needed)
         sendToken(user, 200, res);
-<<<<<<< HEAD
-        // res.status(200).json({ message: 'Login successful' });
-=======
-        
->>>>>>> b0c218e9060fea47271811c139c77e64e6b2045a
+
     } catch (error) {
         console.log(error)
         res.status(500).json({ error: error.message });
