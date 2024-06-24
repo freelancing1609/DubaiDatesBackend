@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const Footer = require('../model/Footer');
-const { isAdmin } = require('../middleware/admin');
 const Category = require('../model/Category');
 const upload = require('../middleware/upload');
-
+const {isAuthenticated}=require('../middleware/isAuthenticated');
+const { createFooter} = require('../utils/Privilege');
 // Create or update footer (singleton pattern)
 // Create Endpoint for Creating or Updating Footer Data
-router.post('/footer-add', isAdmin, upload.single('image'), async (req, res) => {
+router.post('/footer-add', isAuthenticated(["admin"],[createFooter]), upload.single('image'), async (req, res) => {
   try {
       let contactUs = req.body.contactUs;
       let quickLinks = req.body.quickLinks;

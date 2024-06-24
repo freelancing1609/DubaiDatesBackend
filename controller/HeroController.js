@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { isAdmin } = require('../middleware/admin');
 const upload = require('../middleware/upload'); // Import the upload middleware
 const Heros = require('../model/Hero'); // Import your Hero model
-
+const {isAuthenticated } = require('../middleware/isAuthenticated');
+const { createHero, updateHero, deleteHero } = require('../utils/Privilege');
 
 // Define the route to create a Hero
-router.post('/create', isAdmin, upload.single('image'), async (req, res, next) => {
+router.post('/create', isAuthenticated(["admin"],[createHero]), upload.single('image'), async (req, res, next) => {
     const { hero_name } = req.body;
     try {
         // Check if image is uploaded
@@ -46,7 +46,7 @@ router.get('/hero',async (req, res, next) => {
     }
 });
 // Define the route to update a Hero
-router.put('/update/:HeroId', isAdmin, upload.single('image'), async (req, res, next) => {
+router.put('/update/:HeroId', isAuthenticated(['admin'],[updateHero]), upload.single('image'), async (req, res, next) => {
     const { hero_name } = req.body;
     const { HeroId } = req.params;
     try {
@@ -77,7 +77,7 @@ router.put('/update/:HeroId', isAdmin, upload.single('image'), async (req, res, 
     }
 });
 
-router.delete('/delete/:HeroId', isAdmin, async (req, res, next) => {
+router.delete('/delete/:HeroId', isAuthenticated(['admin'],[deleteHero]), async (req, res, next) => {
     const { HeroId } = req.params;
     try {
         // Find the Goals by ID and delete it

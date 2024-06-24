@@ -1,18 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const User = require('../model/User');
 const twilio = require('twilio');
-const {isAuthenticated} = require("../middleware/auth");
+const {isAuthenticated} = require("../middleware/isAuthenticated");
 const sendToken = require('../utils/jwtToken');
 const ErrorHandler = require("../utils/ErrorHandler");
-const { isAdmin } = require('../middleware/admin');
+const bcrypt = require('bcryptjs');
+const {updateProfile}   = require('../utils/Privilege')
 
 // Twilio client initialization
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-// JWT Secret
-const JWT_SECRET = process.env.JWT_SECRET;
 
 // Send OTP for registration
 router.post('/send-otp', async (req, res, next) => {
@@ -28,8 +26,6 @@ router.post('/send-otp', async (req, res, next) => {
         res.status(500).json({ error: error.message });
     }
 });
-
-// Register a new user
 router.post('/register', async (req, res, next) => {
     const { name, email, phoneNumber, otp } = req.body;
     const phoneNumberWithCountryCode = '+91' + phoneNumber;
@@ -51,7 +47,8 @@ router.post('/register', async (req, res, next) => {
         const newUser = new User({
             name,
             email,
-            phoneNumber
+            phoneNumber,
+            roles: ['customer'],
         });
         const user = await newUser.save();
 
@@ -60,7 +57,9 @@ router.post('/register', async (req, res, next) => {
         res.status(500).json({ error: error.message });
     }
 });
-router.put('/updateProfile/:userId', isAuthenticated, async (req, res, next) => {
+
+
+router.put('/updateProfile/:userId', isAuthenticated(["customer"],[updateProfile]), async (req, res, next) => {
     const { name, email, gender,birth_date } = req.body;
     const userId = Number(req.params.userId); 
     try {
@@ -115,10 +114,6 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-router.get('/protected-route', isAuthenticated, (req, res) => {
-    // Access req.user to get user info
-    res.status(200).json({ message: 'Access granted', user: req.user });
-});
 router.get('/alluser', async (req, res) => {
     try {
         const user = await User.find();

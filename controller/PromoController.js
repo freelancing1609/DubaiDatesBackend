@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { isAdmin } = require('../middleware/admin');
 const upload = require('../middleware/upload'); // Import the upload middleware
 const Promo = require('../model/Promo'); // Import your Promo model
-const { isAuthenticated } = require('../middleware/auth');
-
+const { isAuthenticated } = require('../middleware/isAuthenticated');
+const {createPromoProduct,updatePromoProduct,deletePromoProduct} = require('../utils/Privilege')
 // Define the route to create a promo
-router.post('/create', isAdmin, upload.fields([ { name: 'promo_products[].slide_image', maxCount: 1 }, { name: 'promo_products[].mobile_image', maxCount: 1 }]), async (req, res, next) => {
+router.post('/create', isAuthenticated(['admin'],[createPromoProduct]), upload.fields([ { name: 'promo_products[].slide_image', maxCount: 1 }, { name: 'promo_products[].mobile_image', maxCount: 1 }]), async (req, res, next) => {
     const { promo_title, promo_description, promo_products } = req.body;
     try {
   
@@ -63,7 +62,7 @@ router.get('/get', async (req, res, next) => {
 });
 
 // Define the route to update a promo
-router.put('/update/:id', isAdmin, upload.fields([ { name: 'promo_products[].slide_image', maxCount: 1 }, { name: 'promo_products[].mobile_image', maxCount: 1 }]), async (req, res, next) => {
+router.put('/update/:id', isAuthenticated(['admin'],[updatePromoProduct]), upload.fields([ { name: 'promo_products[].slide_image', maxCount: 1 }, { name: 'promo_products[].mobile_image', maxCount: 1 }]), async (req, res, next) => {
     const { id } = req.params;
     const { promo_title, promo_description, promo_products } = req.body;
     try {
@@ -108,7 +107,7 @@ router.put('/update/:id', isAdmin, upload.fields([ { name: 'promo_products[].sli
 });
 
 // Define the route to delete a promo
-router.delete('/delete/:id', isAdmin, async (req, res, next) => {
+router.delete('/delete/:id', isAuthenticated(['admin'],[deletePromoProduct]), async (req, res, next) => {
     const { id } = req.params;
     try {
         // Find the promo by ID and delete it

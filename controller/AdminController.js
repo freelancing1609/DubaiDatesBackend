@@ -1,69 +1,140 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const Admin = require('../model/Admin');
+const User = require('../model/User');
+const {isAuthenticated} = require("../middleware/isAuthenticated");
 const ErrorHandler = require("../utils/ErrorHandler");
-const sendToken = require('../utils/jwtToken');
-const { isAdmin } = require('../middleware/admin');
+const bcrypt = require('bcryptjs');
 
-// Register a new admin 
-router.post('/register', isAdmin,async (req, res, next) => {
-    const { email, password } = req.body;
+// Register a new user
+router.post('/register',isAuthenticated(["admin"]), async (req, res, next) => {
+    const {  email, password, roles } = req.body;
+    let {name,phoneNumber}=req.body
+
     try {
-        // Check if admin already exists
-        const existingAdmin = await Admin.findOne({ email });
-        if (existingAdmin) {
-            return next(new ErrorHandler("Admin already exists", 400));
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            return next(new ErrorHandler("User already exists", 400));
         }
 
         // Hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Save admin data
-        const newAdmin = new Admin({
+        if(!name){
+            name="Admin"
+        }
+        // Save user data
+        const newUser = new User({
+            name,
             email,
-            password: hashedPassword
+            phoneNumber,
+            password: hashedPassword,
+            roles: ['admin'], // Default to customer role if not specified
         });
-        const admin = await newAdmin.save();
+
+        const user = await newUser.save();
 
         // Generate JWT token
-        const token = admin.getJwtToken();
+        const token = user.getJwtToken();
 
-        res.status(201).json({ success: true, admin, token });
+        res.status(201).json({ success: true, user, token });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Login an admin
-router.post('/login', async (req, res, next) => {
-    const { email, password } = req.body;
+// Register a new user
+router.post('/addStaff',isAuthenticated(["admin"]), async (req, res, next) => {
+    const {  email, password, permissions } = req.body;
+    let {name,phoneNumber}=req.body
+    if(!name){
+        name="Admin"
+    }
     try {
-        // Check if admin exists
-        const admin = await Admin.findOne({ email });
-        if (!admin) {
-            return next(new ErrorHandler("Invalid email or password", 401));
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            return next(new ErrorHandler("Staff already exists with this email", 400));
         }
 
+        // Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+
+        // Save user data
+        const newUser = new User({
+            name,
+            email,
+            phoneNumber,
+            password: hashedPassword,
+            roles: ['staff'], // Default to customer role if not specified
+            permissions:permissions
+        });
+
+        const user = await newUser.save();
+
+        // Generate JWT token
+        const token = user.getJwtToken();
+
+        res.status(201).json({ success: true, user, token });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+// Update user permissions
+router.put('/updatePermissions/:userId', isAuthenticated(["admin"]), async (req, res, next) => {
+    const userId = req.params.userId;
+    const { permissions } = req.body;
+
+    try {
+        // Find the user by ID
+        let user = await User.findById(userId);
+
+        if (!user) {
+            return next(new ErrorHandler("User not found", 404));
+        }
+
+        // Update user permissions
+        user.permissions = permissions;
+
+        // Save the updated user to the database
+        user = await user.save();
+
+        // Send response
+        res.status(200).json({ success: true, user });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+    
+router.post('/login',async (req, res, next) => {
+    const { email, password } = req.body;
+
+    try {
+        // Check if user exists
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return next(new ErrorHandler("Invalid email or password", 401));
+        }
         // Check password
-        const isMatch = await bcrypt.compare(password, admin.password);
+        const isMatch = await bcrypt.compare(password, user.password);
+
         if (!isMatch) {
             return next(new ErrorHandler("Invalid email or password", 401));
         }
 
         // Generate JWT token
-        sendToken(admin, 200, res);
+        const token = user.getJwtToken();
+
+        res.status(200).json({ success: true, user, token });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: error.message });
     }
 });
-router.get('/protected-route', isAdmin, (req, res) => {
-    // Access req.user to get user info
-    res.status(200).json({ message: 'Access granted', admin: req.admin });
-});
-
-
-
 module.exports = router;

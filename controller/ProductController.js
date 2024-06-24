@@ -6,10 +6,10 @@ const Category = require('../model/Category');
 const Flavour = require('../model/Flavour');
 const upload = require('../middleware/upload');
 const Goal = require('../model/Goals');
-const { isAdmin } = require('../middleware/admin');
-
+const {isAuthenticated} = require('../middleware/isAuthenticated');
+const { createProduct, updateProduct, deleteProduct } = require('../utils/Privilege');
 // Create a product with image uploads
-router.post('/create',isAdmin, upload.fields([
+router.post('/create',isAuthenticated(['admin'],[createProduct]), upload.fields([
     { name: 'product_image', maxCount: 1 },
     { name: 'product_slide_image', maxCount: 1 },
     { name: 'product_promo_banner_image', maxCount: 1 },
@@ -115,7 +115,7 @@ router.post('/create',isAdmin, upload.fields([
 
 
 
-router.put('/update/:productId', isAdmin, upload.fields([
+router.put('/update/:productId', isAuthenticated(['admin'],[updateProduct]), upload.fields([
     { name: 'product_image', maxCount: 1 },
     { name: 'product_slide_image', maxCount: 1 },
     { name: 'product_promo_banner_image', maxCount: 1 },
@@ -290,7 +290,7 @@ router.get('/products/:productId', async (req, res) => {
     }
 });
 
-router.delete('/delete/:productId', isAdmin, async (req, res, next) => {
+router.delete('/delete/:productId', isAuthenticated(['admin'],[deleteProduct]), async (req, res, next) => {
     const { productId } = req.params;
     try {
         // Find the Goal by ID and delete it

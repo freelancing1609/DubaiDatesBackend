@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { isAdmin } = require('../middleware/admin');
 const upload = require('../middleware/upload'); 
 const EnergySection = require('../model/EnergySection'); 
-
+const {isAuthenticated}=require("../middleware/isAuthenticated")
+const {createEnergySection,updateEnergySection,deleteEnergySection}=require("../utils/Privilege")
 // Define the route to create an energy section
-router.post('/create', isAdmin, upload.fields([{ name: 'energy_image', maxCount: 1 }, { name: 'energy_mobileImage', maxCount: 1 }]), async (req, res, next) => {
+router.post('/create', isAuthenticated(["admin"],[createEnergySection]), upload.fields([{ name: 'energy_image', maxCount: 1 }, { name: 'energy_mobileImage', maxCount: 1 }]), async (req, res, next) => {
     const { energy_title, energy_subTitle, energy_description, energy_mobile_description } = req.body;
     try {
         // Check if both images are uploaded
@@ -54,7 +54,7 @@ router.get('/get', async (req, res, next) => {
 
 // Define the route to update an energy section
 router.put('/update/:id', 
-    isAdmin, 
+    isAuthenticated(["admin"],[updateEnergySection]), 
     upload.fields([{ name: 'energy_image', maxCount: 1 }, { name: 'energy_mobileImage', maxCount: 1 }]), 
     async (req, res, next) => {
         const { id } = req.params;
@@ -93,7 +93,7 @@ router.put('/update/:id',
 );
 
 // Define the route to delete an energy section
-router.delete('/delete/:id', isAdmin, async (req, res, next) => {
+router.delete('/delete/:id', isAuthenticated(['admin'],[deleteEnergySection]), async (req, res, next) => {
     const { id } = req.params;
     try {
         // Find the energy section by ID and delete it

@@ -1,13 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { isAdmin } = require('../middleware/admin');
 const upload = require('../middleware/upload');
 const CategoryFeaturedProduct = require('../model/CategoryFeaturedProduct');
 const Category = require('../model/Category'); // Import your Category model
-const mongoose = require('mongoose');
-
+const {isAuthenticated}=require("../middleware/isAuthenticated")
+const {createCategoryFeaturedProduct,updateCategoryFeaturedProduct}=require("../utils/Privilege")
 // Create a category featured product
-router.post('/create', isAdmin, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'mobileImage', maxCount: 1 }]), async (req, res) => {
+router.post('/create', isAuthenticated(["admin"],[createCategoryFeaturedProduct]), upload.fields([{ name: 'image', maxCount: 1 }, { name: 'mobileImage', maxCount: 1 }]), async (req, res) => {
     const { title, subtitle, category } = req.body;
     try {
         // Check if both images are uploaded
@@ -45,7 +44,7 @@ router.post('/create', isAdmin, upload.fields([{ name: 'image', maxCount: 1 }, {
     }
 });
 // Update a category featured product
-router.put('/update/:id', isAdmin, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'mobileImage', maxCount: 1 }]), async (req, res) => {
+router.put('/update/:id', isAuthenticated(["admin"],[updateCategoryFeaturedProduct]), upload.fields([{ name: 'image', maxCount: 1 }, { name: 'mobileImage', maxCount: 1 }]), async (req, res) => {
     const { id } = req.params;
     const { title, subtitle } = req.body;
     try {
