@@ -122,6 +122,9 @@ router.get('/alluser', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
+router.get('/protected-route', isAuthenticated(['customer']), (req, res) => {
+    // Access req.user to get user info
+    res.status(200).json({ message: 'Access granted', user: req.user });
+});
 
 module.exports = router;
