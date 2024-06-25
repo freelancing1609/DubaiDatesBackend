@@ -24,7 +24,7 @@ UserSchema.pre('save', async function(next) {
 
     try {
         const count = await this.constructor.countDocuments();
-        this._id = count + 12;
+        this._id = 7;
         next();
     } catch (error) {
         next(error);

@@ -17,12 +17,12 @@ router.post('/send-otp', async (req, res, next) => {
     const { phoneNumber } = req.body;
     const phoneNumberWithCountryCode = '+91' + phoneNumber;
     try {
-        await client.verify.v2.services(process.env.TWILIO_SERVICE_SID)
+      const data=  await client.verify.v2.services(process.env.TWILIO_SERVICE_SID)
             .verifications
             .create({ to: phoneNumberWithCountryCode, channel: 'sms' });
-
         res.status(200).json({ message: 'OTP sent successfully' });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: error.message });
     }
 });

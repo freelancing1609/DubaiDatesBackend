@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 
 // Register a new user
 router.post('/register',isAuthenticated(["admin"]), async (req, res, next) => {
-    const {  email, password, roles } = req.body;
+    const {  email, password } = req.body;
     let {name,phoneNumber}=req.body
 
     try {
@@ -117,8 +117,7 @@ router.post('/login',async (req, res, next) => {
     try {
         // Check if user exists
         const user = await User.findOne({ email });
-
-        if (!user) {
+        if (user==null) {
             return next(new ErrorHandler("Invalid email or password", 401));
         }
         // Check password
@@ -136,5 +135,9 @@ router.post('/login',async (req, res, next) => {
         console.log(error)
         res.status(500).json({ error: error.message });
     }
+});
+router.get('/protected-route', isAuthenticated(['admin']), (req, res) => {
+    // Access req.user to get user info
+    res.status(200).json({ message: 'Access granted', user: req.user });
 });
 module.exports = router;
