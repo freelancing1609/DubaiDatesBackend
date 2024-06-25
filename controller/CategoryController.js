@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { isAdmin } = require('../middleware/admin');
 const upload = require('../middleware/upload'); // Import the upload middleware
 const Category = require('../model/Category'); // Import your Category model
-const { isAuthenticated } = require('../middleware/auth');
-
+const { isAuthenticated } = require('../middleware/isAuthenticated');
+const {createCategory,updateCategory,deleteCategory}=require("../utils/Privilege")
 // Define the route to create a category
-router.post('/create', isAdmin, upload.single('image'), async (req, res, next) => {
+router.post('/create', isAuthenticated(["admin"],[createCategory]), upload.single('image'), async (req, res, next) => {
     const { name, cat_description } = req.body;
     try {
         // Check if image is uploaded
@@ -46,7 +45,7 @@ router.get('/categories',async (req, res, next) => {
     }
 });
 // Define the route to update a category
-router.put('/update/:categoryId', isAdmin, upload.single('image'), async (req, res, next) => {
+router.put('/update/:categoryId', isAuthenticated(["admin"],[updateCategory]), upload.single('image'), async (req, res, next) => {
     const { name, cat_description } = req.body;
     const { categoryId } = req.params;
     try {
@@ -77,7 +76,7 @@ router.put('/update/:categoryId', isAdmin, upload.single('image'), async (req, r
     }
 });
 
-router.delete('/delete/:categoryId', isAdmin, async (req, res, next) => {
+router.delete('/delete/:categoryId', isAuthenticated(["admin"],[deleteCategory]), async (req, res, next) => {
     const { categoryId } = req.params;
     try {
         // Find the Goals by ID and delete it

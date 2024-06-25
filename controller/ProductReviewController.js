@@ -3,10 +3,11 @@ const router = express.Router();
 const Product = require("../model/Product");
 const ProductReview = require("../model/ProductReview");
 const User = require("../model/User");
-const { isAuthenticated } = require("../middleware/auth");
-const mongoose = require("mongoose");
+const { isAuthenticated } = require("../middleware/isAuthenticated");
+const {createReview,fetchReview} = require('../utils/Privilege')
 
-router.post("/reviews/:productId", isAuthenticated, async (req, res) => {
+
+router.post("/reviews/:productId", isAuthenticated(['customer'],[createReview]), async (req, res) => {
   try {
     const { user_id, rating, comment } = req.body;
     const productId = req.params.productId;
@@ -48,7 +49,7 @@ router.post("/reviews/:productId", isAuthenticated, async (req, res) => {
 });
 
 // GET reviews by user ID
-router.get('/reviews/:userId',isAuthenticated, async (req, res) => {
+router.get('/reviews/:userId',isAuthenticated(['customer'],[fetchReview]), async (req, res) => {
     const { userId } = req.params;
     const userIdtoNumb = Number(userId);
     try {

@@ -6,13 +6,12 @@ const Product = require('../model/Product');
 const Address = require('../model/Address');
 const OrderItem = require('../model/OrderItem');
 const ErrorHandler = require("../utils/ErrorHandler");
-const {isAuthenticated} = require("../middleware/auth");
-const { isAdmin } = require('../middleware/admin');
+const {isAuthenticated} = require("../middleware/isAuthenticated");
 const moment = require('moment');
-const mongoose = require('mongoose');
+const { createOrder, updateOrder, fetchAllOrder, fetchOrderByUserId, fetchOrderByProductId } = require('../utils/Privilege');
 
 // Create a new order
-router.post('/create', isAuthenticated, async (req, res, next) => {
+router.post('/create', isAuthenticated(["admin"],[createOrder]), async (req, res, next) => {
     const { user_id, payment_status, total_price, delivery_charge, address_id, order_items } = req.body;
     try {
         // Create Order
@@ -70,7 +69,7 @@ router.post('/create', isAuthenticated, async (req, res, next) => {
 });
 
 // Update delivery_status of order_items
-router.put('/update/:orderId',isAdmin, async (req, res, next) => {
+router.put('/update/:orderId',isAuthenticated(['admin'],[updateOrder]), async (req, res, next) => {
     const orderId = req.params.orderId;
     const { order_items } = req.body;
   
@@ -98,35 +97,9 @@ router.put('/update/:orderId',isAdmin, async (req, res, next) => {
 
 
 
-// Get all orders
-// router.get('/all', isAdmin, async (req, res, next) => {
-//     try {
-//         const orders = await Order.find().populate('order_items').populate({
-//             path: 'user_id',
-//             select: 'name email phoneNumber addresses', // Populate user details including addresses
-//         })
-        
-//         // Manually filter the address
-//         const ordersWithSpecificAddress = orders.map(order => {
-//             const user = order.user_id.toObject();
-//             const addresses = user.addresses || [];
-//             const specificAddress = addresses.find(address => address._id.toString() === order.address_id);
-            
-//             return {
-//                 ...order.toObject(),
-//                 user_id: {
-//                     ...user,
-//                     addresses: specificAddress ? [specificAddress] : [],
-//                 }
-//             };
-//         });
-//         res.status(200).json({ success: true, orders: ordersWithSpecificAddress });
-//     } catch (error) {
-//         next(new ErrorHandler(error.message, 500));
-//     }
-// });
 
-router.get('/all', isAdmin, async (req, res, next) => {
+
+router.get('/all', isAuthenticated(['admin'],[fetchAllOrder]), async (req, res, next) => {
     try {
         // Fetch orders and populate 'order_items', 'user_id', and 'address_id'
         const orders = await Order.find()
@@ -166,7 +139,7 @@ router.get('/all', isAdmin, async (req, res, next) => {
 
 
 // Get orders by user ID
-router.get('/user/:user_id', isAuthenticated, async (req, res, next) => {
+router.get('/user/:user_id', isAuthenticated(['customer'],[fetchOrderByUserId]), async (req, res, next) => {
     const { user_id } = req.params;
     try {
         const orders = await Order.find({ user_id }).populate('order_items');
@@ -177,7 +150,7 @@ router.get('/user/:user_id', isAuthenticated, async (req, res, next) => {
 });
 
 // Get orders by product ID
-router.get('/product/:product_id', isAdmin, async (req, res, next) => {
+router.get('/product/:product_id', isAuthenticated(['admin'],[fetchOrderByProductId]), async (req, res, next) => {
     const { product_id } = req.params;
     try {
         const orderItems = await OrderItem.find({ product_id });

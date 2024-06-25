@@ -1,13 +1,11 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
 const Coupon = require('../model/Coupon');
 const Product = require('../model/Product');
-const {isAuthenticated} = require("../middleware/auth");
-const { isAdmin } = require('../middleware/admin');
-
+const {isAuthenticated} = require("../middleware/isAuthenticated");
+const {createCoupon,applyCoupon,deleteCoupon,fetchAllCoupon}=require("../utils/Privilege")
 // Create a new coupon
-router.post('/create',isAdmin, async (req, res) => {
+router.post('/create',isAuthenticated(["admin"],[createCoupon]), async (req, res) => {
     try {
         const couponData = req.body;
         const coupon = new Coupon(couponData);
@@ -29,7 +27,7 @@ router.post('/create',isAdmin, async (req, res) => {
 });
 
 // Get all coupons
-router.get('/list',isAdmin, async (req, res) => {
+router.get('/list',isAuthenticated(["admin"],[fetchAllCoupon]), async (req, res) => {
     try {
         const coupons = await Coupon.find();
         res.status(200).json({ success: true, coupons });
@@ -39,7 +37,7 @@ router.get('/list',isAdmin, async (req, res) => {
 });
 
 // Apply a coupon
-router.post('/apply',isAuthenticated, async (req, res) => {
+router.post('/apply',isAuthenticated(["customer"],[applyCoupon]), async (req, res) => {
     try {
         const { coupon_name, product_id, total_price } = req.body;
 
@@ -105,7 +103,7 @@ router.post('/apply',isAuthenticated, async (req, res) => {
     }
 });
 
-router.delete('/delete/:id', isAdmin, async (req, res, next) => {
+router.delete('/delete/:id', isAuthenticated(["admin"],[deleteCoupon]), async (req, res, next) => {
     const { id } = req.params;
     try {
         // Find the Goal by ID and delete it

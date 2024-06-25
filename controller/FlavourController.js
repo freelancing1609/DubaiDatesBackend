@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { isAdmin } = require('../middleware/admin');
 const Flavour = require('../model/Flavour'); // Import your Flavour model
-
-
+const {isAuthenticated}=require("../middleware/isAuthenticated")
+const {createFlavour,updateFlavour,deleteFlavour} = require("../utils/Privilege")
 // Define the route to create a flavour
-router.post('/create', isAdmin, async (req, res, next) => {
+router.post('/create', [isAuthenticated(["admin"],[createFlavour])], async (req, res, next) => {
     const { name } = req.body;
     try {
         // Create a new flavour object
@@ -39,7 +38,7 @@ router.get('/get-flavours', async (req, res, next) => {
 });
 
 // Define the route to update a flavour
-router.put('/update/:flavourId', isAdmin, async (req, res, next) => {
+router.put('/update/:flavourId', isAuthenticated(["admin"],[updateFlavour]), async (req, res, next) => {
     const { name } = req.body;
     const { flavourId } = req.params;
     try {
@@ -65,7 +64,7 @@ router.put('/update/:flavourId', isAdmin, async (req, res, next) => {
 });
 
 // Define the route to delete a flavour
-router.delete('/delete/:flavourId', isAdmin, async (req, res, next) => {
+router.delete('/delete/:flavourId', isAuthenticated(["admin"],[deleteFlavour]), async (req, res, next) => {
     const { flavourId } = req.params;
     try {
         // Find the flavour by ID and delete it

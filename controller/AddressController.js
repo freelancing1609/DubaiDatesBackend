@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Address = require('../model/Address');
 const User = require('../model/User');
-const {isAuthenticated} = require("../middleware/auth");
-
+const {isAuthenticated} = require("../middleware/isAuthenticated");
+const {createCustomerAddress,updateCustomerAddress,deleteCustomerAddress,fetchCustomerAddress}=require('../utils/Privilege')
 
 
 // Add Address
-router.post('/:userId/addresses/create', isAuthenticated, async (req, res, next) => {
+router.post('/:userId/addresses/create', isAuthenticated(["customer"],[createCustomerAddress]), async (req, res, next) => {
     try {
       const { userId } = req.params;
         const { street, city, state, zipCode, locality,full_address, time_of_delivery,landmark,alt_phoneNumber,phoneNumber,name } = req.body;
@@ -43,7 +43,7 @@ router.post('/:userId/addresses/create', isAuthenticated, async (req, res, next)
     }
   });
   
-  router.put('/:userId/addresses/:addressId', isAuthenticated, async (req, res, next) => {
+  router.put('/:userId/addresses/:addressId', isAuthenticated(["customer"],[updateCustomerAddress]), async (req, res, next) => {
     try {
         const { userId, addressId } = req.params;
         const {
@@ -91,7 +91,7 @@ router.post('/:userId/addresses/create', isAuthenticated, async (req, res, next)
 });
 
   
-router.delete('/:userId/addresses/:addressId', isAuthenticated, async (req, res, next) => {
+router.delete('/:userId/addresses/:addressId', isAuthenticated(["customer"],[deleteCustomerAddress]), async (req, res, next) => {
   try {
       const { userId, addressId } = req.params;
 
@@ -120,7 +120,7 @@ router.delete('/:userId/addresses/:addressId', isAuthenticated, async (req, res,
 
   
   // Get Addresses
-  router.get('/:userId/addresses', isAuthenticated, async (req, res, next) => {
+  router.get('/:userId/addresses', isAuthenticated(["customer"],[fetchCustomerAddress]), async (req, res, next) => {
     try {
         const { userId } = req.params;
 

@@ -25,7 +25,6 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 
 const user = require("./controller/userController");
 const profile = require("./controller/Profilecontroller");
-const admin = require("./controller/AdminController")
 const category=require("./controller/CategoryController")
 const flavour = require("./controller/FlavourController")
 const goal = require("./controller/GoalController")
@@ -42,10 +41,11 @@ const search = require("./controller/SearchController")
 const coupon = require("./controller/couponController")
 const shopByCategory=require("./controller/ShopByCategoryController")
 const energySection=require("./controller/EnergySectionController")
+const admin=require('./controller/AdminController')
 
 app.use("/api/user", user);
-app.use("/api/profile", profile);
 app.use("/api/admin", admin);
+app.use("/api/profile", profile);
 app.use("/api/category", category);
 app.use("/api/flavour", flavour);
 app.use("/api/goal", goal);

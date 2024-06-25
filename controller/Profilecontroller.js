@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../model/User');
-const { isAuthenticated } = require('../middleware/auth');
+const { isAuthenticated } = require('../middleware/isAuthenticated');
 const ErrorHandler = require("../utils/ErrorHandler");
-
+const {updateProfile}   = require('../utils/Privilege')
 // Update profile route
-router.put('/update-profile', isAuthenticated, async (req, res) => {
+router.put('/update-profile', isAuthenticated(['customer'],[updateProfile]), async (req, res) => {
     try {
         // Extract user ID from authenticated request
         const userId = req.user._id;

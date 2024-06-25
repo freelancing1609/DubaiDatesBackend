@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { isAdmin } = require('../middleware/admin');
 const ShopByCategory = require('../model/ShopByCategory')
-
+const {isAuthenticated } = require('../middleware/isAuthenticated')
+const {createShopByCategory,deleteShopByCategory}=require('../utils/Privilege')
 // Define the route to create or update the ShopByCategory document
-router.post('/shop-by-category', isAdmin, async (req, res, next) => {
+router.post('/shop-by-category', isAuthenticated(['admin'],[createShopByCategory]), async (req, res, next) => {
     const { shop_by_categories_title, shop_by_categories_button_link_url, shop_by_categories_link_name } = req.body;
     try {
         // Check if ShopByCategory document already exists
@@ -50,7 +50,7 @@ router.get('/shop-by-category', async (req, res, next) => {
 });
 
 // Define the route to delete the ShopByCategory document
-router.delete('/shop-by-category', isAdmin, async (req, res, next) => {
+router.delete('/shop-by-category', isAuthenticated(['admin'],[deleteShopByCategory]), async (req, res, next) => {
     try {
         // Find and delete the ShopByCategory document
         const shopByCategory = await ShopByCategory.findOneAndDelete();

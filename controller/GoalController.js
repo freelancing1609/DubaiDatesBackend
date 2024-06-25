@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { isAdmin } = require('../middleware/admin');
 const goal = require('../model/Goals');
-
-
+const {isAuthenticated }=require("../middleware/isAuthenticated")
+const {createGoal,updateGoal,deleteGoal} = require("../utils/Privilege")
  // Import your Goal model
 
 
 // Define the route to create a Goal
-router.post('/create', isAdmin, async (req, res, next) => {
+router.post('/create', isAuthenticated(["admin"],[createGoal]), async (req, res, next) => {
     const { name } = req.body;
     try {
         // Create a new Goal object
@@ -42,7 +41,7 @@ router.get('/get-goal', async (req, res, next) => {
 });
 
 // Define the route to update a Goal
-router.put('/update/:GoalId', isAdmin, async (req, res, next) => {
+router.put('/update/:GoalId', isAuthenticated(["admin"],[updateGoal]), async (req, res, next) => {
     const { name } = req.body;
     const { GoalId } = req.params;
     try {
@@ -68,7 +67,7 @@ router.put('/update/:GoalId', isAdmin, async (req, res, next) => {
 });
 
 // Define the route to delete a Goal
-router.delete('/delete/:GoalId', isAdmin, async (req, res, next) => {
+router.delete('/delete/:GoalId', isAuthenticated(['admin'],[deleteGoal]), async (req, res, next) => {
     const { GoalId } = req.params;
     try {
         // Find the Goal by ID and delete it
