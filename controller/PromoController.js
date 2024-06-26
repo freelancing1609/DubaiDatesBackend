@@ -5,36 +5,24 @@ const Promo = require('../model/Promo'); // Import your Promo model
 const { isAuthenticated } = require('../middleware/isAuthenticated');
 const {createPromoProduct,updatePromoProduct,deletePromoProduct} = require('../utils/Privilege')
 // Define the route to create a promo
-router.post('/create', isAuthenticated(['admin'],[createPromoProduct]), upload.fields([ { name: 'promo_products[].slide_image', maxCount: 1 }, { name: 'promo_products[].mobile_image', maxCount: 1 }]), async (req, res, next) => {
-    const { promo_title, promo_description, promo_products } = req.body;
+router.post('/create', isAuthenticated(['admin'],[createPromoProduct]), upload.fields([{ name: 'promo_image', maxCount: 1 }, { name: 'promo_mobileImage', maxCount: 1 }]), async (req, res, next) => {
+    const { promo_title, promo_subTitle } = req.body;
     try {
-  
-
-        // Parse the promo products JSON if it's a string
-        let promoProducts = [];
-        if (typeof promo_products === 'string') {
-            promoProducts = JSON.parse(promo_products);
-        } else {
-            promoProducts = promo_products;
+        // Check if both images are uploaded
+        if (!req.files || !req.files.promo_image || !req.files.promo_mobileImage) {
+            return res.status(400).json({ success: false, message: 'Both promo_image and promo_mobileImage are required' });
         }
 
-        // Update the promo products with image paths
-        promoProducts = promoProducts.map((product, index) => {
-            if (req.files[`promo_products[${index}].slide_image`]) {
-                product.slide_image = req.files[`promo_products[${index}].slide_image`][0].path;
-            }
-            if (req.files[`promo_products[${index}].mobile_image`]) {
-                product.mobile_image = req.files[`promo_products[${index}].mobile_image`][0].path;
-            }
-            return product;
-        });
+        // Get the image URLs from Cloudinary
+        const promoImageUrl = req.files.promo_image[0].path;
+        const promoMobileImageUrl = req.files.promo_mobileImage[0].path;
 
         // Create a new promo object
         const newPromo = new Promo({
             promo_title,
-            promo_description,
+            promo_subTitle,
             promo_image: promoImageUrl, // Save the promo image URL to the database
-            promo_products: promoProducts,
+            promo_mobileImage: promoMobileImageUrl // Save the promo mobile image URL to the database
         });
 
         // Save the promo to the database
@@ -62,9 +50,10 @@ router.get('/get', async (req, res, next) => {
 });
 
 // Define the route to update a promo
-router.put('/update/:id', isAuthenticated(['admin'],[updatePromoProduct]), upload.fields([ { name: 'promo_products[].slide_image', maxCount: 1 }, { name: 'promo_products[].mobile_image', maxCount: 1 }]), async (req, res, next) => {
+router.put('/update/:id', isAuthenticated(['admin'],[updatePromoProduct]),upload.fields([{ name: 'promo_image', maxCount: 1 }, { name: 'promo_mobileImage', maxCount: 1 }]), 
+async (req, res, next) => {
     const { id } = req.params;
-    const { promo_title, promo_description, promo_products } = req.body;
+    const { promo_title, promo_subTitle } = req.body;
     try {
         // Find the promo by ID
         const promo = await Promo.findById(id);
@@ -74,25 +63,14 @@ router.put('/update/:id', isAuthenticated(['admin'],[updatePromoProduct]), uploa
 
         // Update promo fields
         if (promo_title) promo.promo_title = promo_title;
-        if (promo_description) promo.promo_description = promo_description;
-        
+        if (promo_subTitle) promo.promo_subTitle = promo_subTitle;
 
-        // Update promo products if provided
-        if (promo_products) {
-            let promoProducts = typeof promo_products === 'string' ? JSON.parse(promo_products) : promo_products;
-
-            // Update the promo products with image paths
-            promoProducts = promoProducts.map((product, index) => {
-                if (req.files[`promo_products[${index}].slide_image`]) {
-                    product.slide_image = req.files[`promo_products[${index}].slide_image`][0].path;
-                }
-                if (req.files[`promo_products[${index}].mobile_image`]) {
-                    product.mobile_image = req.files[`promo_products[${index}].mobile_image`][0].path;
-                }
-                return product;
-            });
-
-            promo.promo_products = promoProducts;
+        // Check if new images are uploaded
+        if (req.files && req.files.promo_image) {
+            promo.promo_image = req.files.promo_image[0].path;
+        }
+        if (req.files && req.files.promo_mobileImage) {
+            promo.promo_mobileImage = req.files.promo_mobileImage[0].path;
         }
 
         // Save the updated promo to the database

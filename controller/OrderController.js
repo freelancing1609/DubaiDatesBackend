@@ -11,7 +11,7 @@ const moment = require('moment');
 const { createOrder, updateOrder, fetchAllOrder, fetchOrderByUserId, fetchOrderByProductId } = require('../utils/Privilege');
 
 // Create a new order
-router.post('/create', isAuthenticated(["admin"],[createOrder]), async (req, res, next) => {
+router.post('/create', isAuthenticated(["customer"],[createOrder]), async (req, res, next) => {
     const { user_id, payment_status, total_price, delivery_charge, address_id, order_items } = req.body;
     try {
         // Create Order

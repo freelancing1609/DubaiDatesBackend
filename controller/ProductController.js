@@ -33,7 +33,8 @@ router.post('/create',isAuthenticated(['admin'],[createProduct]), upload.fields(
             product_details,
             product_categories,
             product_falvours,
-            product_goal
+            product_goal,
+            promo
         } = req.body;
         // Upload images to Cloudinary and get URLs
         if (!req.files || !req.files.product_image || !req.files.product_slide_image || !req.files.product_promo_banner_image || !req.files.product_video_image || !req.files.product_creative_image) {
@@ -104,7 +105,8 @@ router.post('/create',isAuthenticated(['admin'],[createProduct]), upload.fields(
             product_details,
             product_categories: categoryDetails,
             product_falvours: flavourDetails,
-            product_goal: goalDetails
+            product_goal: goalDetails,
+            promo: promo === 'on' ? true : false,
         });
         await product.save();
         res.status(201).json(product);
@@ -139,7 +141,8 @@ router.put('/update/:productId', isAuthenticated(['admin'],[updateProduct]), upl
             product_details,
             product_categories,
             product_falvours,
-            product_goal
+            product_goal,
+            promo
         } = req.body;
 
         // // Validate category IDs, flavour IDs, and goal IDs
@@ -213,6 +216,7 @@ router.put('/update/:productId', isAuthenticated(['admin'],[updateProduct]), upl
             product.product_categories = categoryDetails;
             product.product_falvours = flavourDetails;
             product.product_goal = goalDetails;
+            product.promo = promo === 'on' ? true : false;
 
             // Update images if provided
             if (req.files.product_image) {
@@ -251,6 +255,7 @@ router.put('/update/:productId', isAuthenticated(['admin'],[updateProduct]), upl
                 product_benefits,
                 product_ingredients,
                 product_details,
+                promo,
                 product_categories: categoryDetails,
                 product_falvours: flavourDetails,
                 product_goal: goalDetails
@@ -271,7 +276,9 @@ router.put('/update/:productId', isAuthenticated(['admin'],[updateProduct]), upl
 router.get('/allproducts', async (req, res) => {
     try {
         const products = await Product.find();
-        res.status(200).json(products);
+        const regularProducts = products.filter(product => !product.promo);
+    const promoProducts = products.filter(product => product.promo);
+        res.status(200).json({ regularProducts, promoProducts,products });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

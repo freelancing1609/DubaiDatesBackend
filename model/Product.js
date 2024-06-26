@@ -31,6 +31,10 @@ const ProductSchema = new mongoose.Schema({
     product_categories: [{ type: Object }],
     product_falvours: [{ type: Object }],
     product_goal: [{ type: Object }],
+    promo: {
+        type: Boolean,
+        default: false,
+      },
 });
 
 ProductSchema.pre('save', async function(next) {
