@@ -5,16 +5,13 @@ const User = require("../model/User");
 exports.isAuthenticated = (requiredRoles = [], requiredPermissions = []) => async (req, res, next) => {
     // Get token from headers or query params or cookies
     const token = req.headers.authorization;
-
     if (!token) {
         return next(new ErrorHandler("Please login to continue", 401));
     }
-
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
         req.user = await User.findById(decoded.id);
-
         if (!req.user) {
             return next(new ErrorHandler("User not found", 404));
         }

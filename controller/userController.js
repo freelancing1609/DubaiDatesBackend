@@ -116,7 +116,7 @@ router.post('/login', async (req, res, next) => {
 
 router.get('/alluser', async (req, res) => {
     try {
-        const user = await User.find();
+        const user = await User.find({roles:"customer"});
         res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ error: error.message });

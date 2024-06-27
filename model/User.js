@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema({
     dateOfBirth: { type: Date, default: null },
     gender: { type: String, default: null },
     password: {type:String },
+    plainPassword:{type:String},
     addresses: [{ type: Schema.Types.ObjectId, ref: 'Address' }],
     roles: { type: [String], default: ['customer'] }, // Array of roles
     created_date: { type: Date, default: Date.now },
@@ -24,7 +25,7 @@ UserSchema.pre('save', async function(next) {
 
     try {
         const count = await this.constructor.countDocuments();
-        this._id = 7;
+        this._id =count+100;
         next();
     } catch (error) {
         next(error);

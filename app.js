@@ -42,9 +42,10 @@ const coupon = require("./controller/couponController")
 const shopByCategory=require("./controller/ShopByCategoryController")
 const energySection=require("./controller/EnergySectionController")
 const admin=require('./controller/AdminController')
-
+const staff = require('./controller/StaffController.js')
 app.use("/api/user", user);
 app.use("/api/admin", admin);
+app.use("/api/staff", staff);
 app.use("/api/profile", profile);
 app.use("/api/category", category);
 app.use("/api/flavour", flavour);
