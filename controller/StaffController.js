@@ -29,7 +29,6 @@ router.post('/register', isAuthenticated(['admin']), async (req, res, next) => {
     const newUser = new User({
       name,
       email,
-      phoneNumber,
       password: hashedPassword,
       plainPassword: password,
       roles: ['staff'],

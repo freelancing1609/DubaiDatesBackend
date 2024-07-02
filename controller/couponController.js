@@ -27,7 +27,7 @@ router.post('/create',isAuthenticated(["admin"],[createCoupon]), async (req, res
 });
 
 // Get all coupons
-router.get('/list',isAuthenticated(["admin"],[fetchAllCoupon]), async (req, res) => {
+router.get('/list',isAuthenticated(["admin"],[fetchAllCoupon,applyCoupon,deleteCoupon,createCoupon]), async (req, res) => {
     try {
         const coupons = await Coupon.find();
         res.status(200).json({ success: true, coupons });

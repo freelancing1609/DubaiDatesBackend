@@ -120,7 +120,7 @@ router.delete('/:userId/addresses/:addressId', isAuthenticated(["customer"],[del
 
   
   // Get Addresses
-  router.get('/:userId/addresses', isAuthenticated(["customer"],[fetchCustomerAddress]), async (req, res, next) => {
+  router.get('/:userId/addresses', isAuthenticated(["customer"],[fetchCustomerAddress,updateCustomerAddress,deleteCustomerAddress,createCustomerAddress]), async (req, res, next) => {
     try {
         const { userId } = req.params;
 

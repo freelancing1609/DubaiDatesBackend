@@ -117,6 +117,7 @@ router.post('/login',async (req, res, next) => {
     try {
         // Check if user exists
         const user = await User.findOne({ email });
+        console.log(user)
         if (user==null) {
             return next(new ErrorHandler("Invalid email or password", 401));
         }

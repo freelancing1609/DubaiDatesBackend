@@ -49,7 +49,7 @@ router.post("/reviews/:productId", isAuthenticated(['customer'],[createReview]),
 });
 
 // GET reviews by user ID
-router.get('/reviews/:userId',isAuthenticated(['customer'],[fetchReview]), async (req, res) => {
+router.get('/reviews/:userId',isAuthenticated(['customer'],[fetchReview,createReview]), async (req, res) => {
     const { userId } = req.params;
     const userIdtoNumb = Number(userId);
     try {

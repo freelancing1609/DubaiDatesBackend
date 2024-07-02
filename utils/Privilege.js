@@ -2,7 +2,7 @@
 const createCategory = "createCategory";
 const deleteCategory = "deleteCategory";
 const updateCategory = "updateCategory";
-
+const fetchAllUser="fetchAllUser"
 const createCategoryFeaturedProduct="createCategoryFeaturedProduct";
 const updateCategoryFeaturedProduct="updateCategoryFeaturedProduct";
 
@@ -44,7 +44,7 @@ const createReview="createReview"
 const fetchReview="fetchReview"
 
 const updateProfile="updateProfile"
-
+const fetchPartner="fetchPartner"
 const createPromoProduct="createPromoProduct"
 const updatePromoProduct="updatePromoProduct"
 const deletePromoProduct="deletePromoProduct"
@@ -98,7 +98,9 @@ const permissionsList=[
     createCustomerAddress,
     updateCustomerAddress,
     deleteCustomerAddress,
-    fetchCustomerAddress
+    fetchCustomerAddress,
+    fetchAllUser,
+    fetchPartner
     ]
     const formattedPermissions = permissionsList.map((permission, index) => ({
         id: index + 1,
@@ -147,5 +149,7 @@ module.exports = {
     updateCustomerAddress,
     deleteCustomerAddress,
     fetchCustomerAddress,
+    fetchAllUser,
+    fetchPartner,
     formattedPermissions
 };

@@ -15,7 +15,6 @@ exports.isAuthenticated = (requiredRoles = [], requiredPermissions = []) => asyn
         if (!req.user) {
             return next(new ErrorHandler("User not found", 404));
         }
-
         // Admins bypass all checks
         if (req.user.roles.includes('admin')) {
             return next();
@@ -25,8 +24,8 @@ exports.isAuthenticated = (requiredRoles = [], requiredPermissions = []) => asyn
         const hasRequiredRoles = requiredRoles.length === 0 || requiredRoles.some(role => req.user.roles.includes(role));
         
         // Check if required permissions are specified and validate user permissions
-        const hasRequiredPermissions = requiredPermissions.length === 0 || checkPermissions(req.user, requiredPermissions);
-
+        const hasRequiredPermissions =  checkPermissions(req.user, requiredPermissions);
+        console.log(req.user.permission)
         if (!hasRequiredRoles && !hasRequiredPermissions) {
             return next(new ErrorHandler("Insufficient roles or permissions", 403));
         }
@@ -41,6 +40,9 @@ exports.isAuthenticated = (requiredRoles = [], requiredPermissions = []) => asyn
 function checkPermissions(user, requiredPermissions) {
     // Implement your logic to check if user has requiredPermissions
     // Example logic:
-    const userPermissions = user.permissions || []; // Assuming you have permissions field in User model
+    if(user.permission){
+    const userPermissions = user.permissions   // Assuming you have permissions field in User model
     return requiredPermissions.every(permission => userPermissions.includes(permission));
+    }
+    return false;
 }

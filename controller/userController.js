@@ -6,7 +6,7 @@ const {isAuthenticated} = require("../middleware/isAuthenticated");
 const sendToken = require('../utils/jwtToken');
 const ErrorHandler = require("../utils/ErrorHandler");
 const bcrypt = require('bcryptjs');
-const {updateProfile}   = require('../utils/Privilege')
+const {updateProfile ,fetchAllUser}   = require('../utils/Privilege')
 
 // Twilio client initialization
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -114,7 +114,7 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-router.get('/alluser', async (req, res) => {
+router.get('/alluser',isAuthenticated(['admin'],[fetchAllUser]), async (req, res) => {
     try {
         const user = await User.find({roles:"customer"});
         res.status(200).json(user);

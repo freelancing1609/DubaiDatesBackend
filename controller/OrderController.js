@@ -99,7 +99,7 @@ router.put('/update/:orderId',isAuthenticated(['admin'],[updateOrder]), async (r
 
 
 
-router.get('/all', isAuthenticated(['admin'],[fetchAllOrder]), async (req, res, next) => {
+router.get('/all', isAuthenticated(['admin'],[fetchAllOrder,updateOrder,createOrder]), async (req, res, next) => {
     try {
         // Fetch orders and populate 'order_items', 'user_id', and 'address_id'
         const orders = await Order.find()
@@ -139,7 +139,7 @@ router.get('/all', isAuthenticated(['admin'],[fetchAllOrder]), async (req, res, 
 
 
 // Get orders by user ID
-router.get('/user/:user_id', isAuthenticated(['customer'],[fetchOrderByUserId]), async (req, res, next) => {
+router.get('/user/:user_id', isAuthenticated(['customer'],[fetchOrderByUserId,updateOrder,createOrder]), async (req, res, next) => {
     const { user_id } = req.params;
     try {
         const orders = await Order.find({ user_id }).populate('order_items');
@@ -150,7 +150,7 @@ router.get('/user/:user_id', isAuthenticated(['customer'],[fetchOrderByUserId]),
 });
 
 // Get orders by product ID
-router.get('/product/:product_id', isAuthenticated(['admin'],[fetchOrderByProductId]), async (req, res, next) => {
+router.get('/product/:product_id', isAuthenticated(['admin'],[fetchOrderByProductId,updateOrder,createOrder]), async (req, res, next) => {
     const { product_id } = req.params;
     try {
         const orderItems = await OrderItem.find({ product_id });
