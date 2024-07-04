@@ -17,7 +17,9 @@ router.post('/register', isAuthenticated(['admin']), async (req, res, next) => {
     if (existingUser) {
       return next(new ErrorHandler('User already exists', 400))
     }
-
+    if(permissions.length==0){
+      return next(new ErrorHandler("Staff should have atleast one permissions",400))
+    }
     // Hash the password
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)
@@ -85,5 +87,12 @@ router.get(
 router.get('/staffs', isAuthenticated(['admin']), async (req, res, next) => {
   const staffs = await User.find({ roles: 'staff' })
   return res.status(200).json({ success: true, staffs })
+})
+router.get('/permission',isAuthenticated(['staff']),async(req, res, next)=>{
+let permissions=req.user.permissions
+  if(req.user.roles[0]==="admin"){
+    permissions="ALL"
+  }
+  return res.status(200).json({success:true,permission:permissions})
 })
 module.exports = router
