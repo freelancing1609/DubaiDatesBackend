@@ -56,6 +56,10 @@ const createCustomerAddress='createCustomerAddress'
 const updateCustomerAddress='updateCustomerAddress'
 const deleteCustomerAddress='deleteCustomerAddress'
 const fetchCustomerAddress='fetchCustomerAddress'
+const createStaff='createStaff'
+const updateStaff='updateStaff'
+const deleteStaff='deleteStaff'
+const fetchStaff='fetchStaff'
 const permissionsList=[
     createCategory,
     deleteCategory,
@@ -100,7 +104,11 @@ const permissionsList=[
     deleteCustomerAddress,
     fetchCustomerAddress,
     fetchAllUser,
-    fetchPartner
+    fetchPartner,
+    createStaff,
+    updateStaff,
+    deleteStaff,
+    fetchStaff
     ]
     const formattedPermissions = permissionsList.map((permission, index) => ({
         id: index + 1,
@@ -151,5 +159,9 @@ module.exports = {
     fetchCustomerAddress,
     fetchAllUser,
     fetchPartner,
+    createStaff,
+    updateStaff,
+    deleteStaff,
+    fetchStaff,
     formattedPermissions
 };
