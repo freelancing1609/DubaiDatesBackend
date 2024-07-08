@@ -4,9 +4,9 @@ const User = require('../model/User')
 const { isAuthenticated } = require('../middleware/isAuthenticated')
 const ErrorHandler = require('../utils/ErrorHandler')
 const bcrypt = require('bcryptjs')
-const { formattedPermissions } = require('../utils/Privilege')
+const { formattedPermissions ,createStaff,updateStaff,deleteStaff,fetchStaff} = require('../utils/Privilege')
 // Register a new staff
-router.post('/register', isAuthenticated(['admin']), async (req, res, next) => {
+router.post('/register', isAuthenticated(['admin'],[createStaff]), async (req, res, next) => {
   const { email, password, permissions } = req.body
   let { name, phoneNumber } = req.body
 
@@ -27,6 +27,7 @@ router.post('/register', isAuthenticated(['admin']), async (req, res, next) => {
     if (!name) {
       name = 'Admin'
     }
+    
     // Save user data
     const newUser = new User({
       name,
@@ -48,7 +49,7 @@ router.post('/register', isAuthenticated(['admin']), async (req, res, next) => {
     res.status(500).json({ error: error.message })
   }
 })
-router.put('/permissions/:id',isAuthenticated(['admin']),async (req, res, next)=>{
+router.put('/permissions/:id',isAuthenticated(['admin'],[updateStaff]),async (req, res, next)=>{
     const {id} = req.params
     const {permissions} = req.body
     try {
@@ -61,7 +62,7 @@ router.put('/permissions/:id',isAuthenticated(['admin']),async (req, res, next)=
             res.status(500).json({error: error.message})
         }
 })
-router.delete('/:id', isAuthenticated(['admin']), async (req, res, next) => {
+router.delete('/:id', isAuthenticated(['admin'],[deleteStaff]), async (req, res, next) => {
   try {
     const { id} = req.params
     const user = await User.findById(id)
@@ -84,7 +85,7 @@ router.get(
     return res.status(200).json({ success: true, formattedPermissions })
   },
 )
-router.get('/staffs', isAuthenticated(['admin']), async (req, res, next) => {
+router.get('/staffs', isAuthenticated(['admin'],[createStaff,updateStaff,deleteStaff]), async (req, res, next) => {
   const staffs = await User.find({ roles: 'staff' })
   return res.status(200).json({ success: true, staffs })
 })
