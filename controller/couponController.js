@@ -35,6 +35,14 @@ router.get('/list',isAuthenticated(["admin"],[fetchAllCoupon,applyCoupon,deleteC
         res.status(500).json({ error: error.message });
     }
 });
+router.get('/list/frontend',isAuthenticated(["customer"],[fetchAllCoupon]), async (req, res) => {
+    try {
+        const coupons = await Coupon.find();
+        res.status(200).json({ success: true, coupons });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // Apply a coupon
 router.post('/apply',isAuthenticated(["customer"],[applyCoupon]), async (req, res) => {
